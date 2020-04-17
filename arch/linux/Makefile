@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: MIT
+
+CROSS_COPMILE ?=
+
+# Tools
+AS := $(CROSS_COMPILE)gcc
+CC := $(CROSS_COMPILE)gcc
+LD := $(CROSS_COMPILE)gcc
+
+ARCH_AFLAGS :=
+ARCH_CFLAGS :=
+ARCH_LDFLAGS :=
+
+ARCH_RUN = \
+	$<
