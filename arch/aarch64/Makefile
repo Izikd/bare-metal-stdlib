@@ -32,4 +32,5 @@ ARCH_RUN = \
 	-smp 1 \
 	-nographic \
 	-serial mon:stdio \
+	-nodefaults \
 	-kernel $< \
