@@ -1,0 +1,24 @@
+language: shell
+os: linux
+dist: bionic
+
+jobs:
+  include:
+
+    - name: "Build Linux"
+      env:
+      - ARCH=linux
+      script:
+      - make run_hello_world
+      - cat build/config.log
+
+    - name: "Build AArch64"
+      before_install:
+      - sudo apt-get -y install qemu-system-arm
+      - wget https://releases.linaro.org/components/toolchain/binaries/latest-7/aarch64-elf/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-elf.tar.xz
+      - tar xf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-elf.tar.xz
+      env:
+      - ARCH=aarch64 CROSS_COMPILE=gcc-linaro-7.5.0-2019.12-x86_64_aarch64-elf/bin/aarch64-elf-
+      script:
+      - make run_hello_world
+      - cat build/config.log
