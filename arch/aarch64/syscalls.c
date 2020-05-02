@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: MIT
 
+/**
+ * Uses these sources as a reference or a guide:
+ * - https://www.embecosm.com/appnotes/ean9/ean9-howto-newlib-1.0.html
+ * - https://github.com/bminor/newlib/tree/master/libgloss/libnosys
+ */
+
 #include <unistd.h>
 #include <errno.h>
 #include <sys/stat.h>
@@ -14,6 +20,15 @@ char **environ = __env;
 extern char heap_base;
 extern char heap_top;
 static char *heap_cur = &heap_base;
+
+void _exit_asm(int rc) __attribute__((noreturn));
+
+void _exit(int rc)
+{
+	printf("exit(%d)\n", rc);
+
+	_exit_asm(rc);
+}
 
 void *_sbrk(int increment)
 {

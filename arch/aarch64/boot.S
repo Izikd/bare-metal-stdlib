@@ -21,6 +21,10 @@ _start:
 	mov x1, 0
 	bl main
 
+	/* fall-through to _exit_asm */
+
+.global _exit_asm
+_exit_asm:
 	/* Poweroff system using PSCI */
 	bl arm_psci_system_off
 
