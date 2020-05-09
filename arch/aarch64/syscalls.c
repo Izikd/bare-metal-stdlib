@@ -6,11 +6,13 @@
  * - https://github.com/bminor/newlib/tree/master/libgloss/libnosys
  */
 
+#include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
+#include <_syslist.h>
 
 #include "arm_uart.h"
 
@@ -68,7 +70,7 @@ int _write(int file,
 	   char *ptr,
 	   int len)
 {
-	if ((file != STDOUT_FILENO) && (file != STDERR_FILENO))	{
+	if ((file != STDOUT_FILENO) && (file != STDERR_FILENO)) {
 		errno = EBADF;
 
 		return -1;
@@ -83,9 +85,30 @@ int _read(int file,
 	   char *ptr,
 	   int len)
 {
-	errno = ENOSYS;
+	int i;
+	char c = 0;
 
-	return -1;
+	if (file != STDIN_FILENO) {
+		errno = EBADF;
+
+		return -1;
+	}
+
+	/* Stop at end of buffer or if previous char was new line */
+	for (i = 0; (i < len) && (c != '\n'); i++) {
+		c = arm_uart_getc(ARM_UART_BASE);
+
+		/* Fixup */
+		if (c == '\r')
+			c = '\n';
+
+		/* Echo back */
+		arm_uart_putc(ARM_UART_BASE, c);
+
+		ptr[i] = c;
+	}
+
+	return i;
 }
 
 int _lseek(int file,
