@@ -9,8 +9,6 @@ int main(void)
 	float f;
 	int rc;
 
-	setvbuf
-
 	/* Integer */
 	printf("Enter an integer: ");
 	fflush(stdout);
