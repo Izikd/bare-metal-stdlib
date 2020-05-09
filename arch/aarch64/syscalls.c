@@ -30,6 +30,16 @@ void _exit(int rc)
 	_exit_asm(rc);
 }
 
+int _getpid(void)
+{
+	/**
+	 * This is a single process.
+	 * Value '0' might be some magic PID for some applications,
+	 * i.e. the root process.
+	 */
+	return 1;
+}
+
 void *_sbrk(int increment)
 {
 	char *alloc_start;
