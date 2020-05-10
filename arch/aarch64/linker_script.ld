@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: MIT */
 
+ENTRY(_start)
+
 SECTIONS
 {
 	. = 0x40010000;
