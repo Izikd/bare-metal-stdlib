@@ -59,12 +59,9 @@ define target_name
 $(Q)printf "% 5s %s\n" $(1) $(2)
 endef
 
-define to_objs
-$(patsubst %.$(2),$(BUILD_DIR)/%.o,$(filter %.$(2), $(1)))
+define find_objs
+$(foreach suffix,c S,$(patsubst %.$(suffix),$(BUILD_DIR)/%.o,$(shell find $(1) -not -type d -name '*.$(suffix)')))
 endef
-
-# Arch
-ARCH_SRCS := $(wildcard $(ARCH_DIR)/*.[cS])
 
 # Applications
 APPS_DIRS := $(wildcard $(APPS_DIR)/*)
@@ -78,8 +75,8 @@ APPS_SRCS = $(foreach dir,$(APPS_DIRS),$(wildcard $(dir)/*.[cS]))
 RUN_TARGETS := $(addprefix run_,$(APPS_NAMES))
 
 # Objects
-ARCH_OBJS := $(call to_objs,$(ARCH_SRCS),S) $(call to_objs,$(ARCH_SRCS),c)
-APPS_OBJS := $(call to_objs,$(APPS_SRCS),S) $(call to_objs,$(APPS_SRCS),c)
+ARCH_OBJS := $(call find_objs,$(ARCH_DIR))
+APPS_OBJS := $(call find_objs,$(APPS_DIRS))
 
 # Phony targets
 all: app_$(DEFAULT_APP)
@@ -98,11 +95,9 @@ help:
 	$(Q)echo "Supported ARCH: $(patsubst arch/%,%,$(wildcard arch/*))"
 
 print_debug:
-	$(Q)echo "ARCH_SRCS = $(ARCH_SRCS)"
 	$(Q)echo "APPS_DIRS = $(APPS_DIRS)"
 	$(Q)echo "APPS_NAMES = $(APPS_NAMES)"
 	$(Q)echo "APPS_TARGETS = $(APPS_TARGETS)"
-	$(Q)echo "APPS_SRCS = $(APPS_SRCS)"
 	$(Q)echo "ARCH_OBJS = $(ARCH_OBJS)"
 	$(Q)echo "APPS_OBJS = $(APPS_OBJS)"
 
