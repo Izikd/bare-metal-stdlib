@@ -64,6 +64,10 @@ define find_objs
 $(foreach suffix,c S,$(patsubst %.$(suffix),$(BUILD_DIR)/%.o,$(shell find $(1) -not -type d -name '*.$(suffix)')))
 endef
 
+define include_path
+$(patsubst %,-I%,$(shell find $(1) -mindepth $(2) -mindepth $(3) -type d))
+endef
+
 # Applications
 APPS_DIRS := $(wildcard $(APPS_DIR)/*)
 APPS_NAMES := $(patsubst $(APPS_DIR)/%,%,$(APPS_DIRS))
@@ -79,6 +83,14 @@ RUN_TARGETS := $(addprefix run_,$(APPS_NAMES))
 COMMON_OBJS := $(call find_objs,$(COMMON_DIR))
 ARCH_OBJS := $(call find_objs,$(ARCH_DIR))
 APPS_OBJS := $(call find_objs,$(APPS_DIRS))
+
+# Add include path
+INCLUDE_PATH := \
+	$(call include_path,$(COMMON_DIR),1,1) \
+	$(call include_path,$(ARCH_DIR),1,1) \
+
+AFLAGS += $(INCLUDE_PATH)
+CFLAGS += $(INCLUDE_PATH)
 
 # Phony targets
 all: app_$(DEFAULT_APP)
@@ -103,6 +115,7 @@ print_debug:
 	$(Q)echo "COMMON_OBJS = $(COMMON_OBJS)"
 	$(Q)echo "ARCH_OBJS = $(ARCH_OBJS)"
 	$(Q)echo "APPS_OBJS = $(APPS_OBJS)"
+	$(Q)echo "INCLUDE_PATH = $(INCLUDE_PATH)"
 
 .PHONY: all clean print_debug $(APPS_EASY_TARGETS) $(RUN_TARGETS) FORCE
 
