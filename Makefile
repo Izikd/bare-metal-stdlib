@@ -10,6 +10,7 @@ endif
 # Directories
 DEFAULT_APP := hello_world
 BUILD_DIR := build
+COMMON_DIR := common
 APPS_DIR := apps
 ARCH_DIR := arch/$(ARCH)
 
@@ -75,6 +76,7 @@ APPS_SRCS = $(foreach dir,$(APPS_DIRS),$(wildcard $(dir)/*.[cS]))
 RUN_TARGETS := $(addprefix run_,$(APPS_NAMES))
 
 # Objects
+COMMON_OBJS := $(call find_objs,$(COMMON_DIR))
 ARCH_OBJS := $(call find_objs,$(ARCH_DIR))
 APPS_OBJS := $(call find_objs,$(APPS_DIRS))
 
@@ -98,6 +100,7 @@ print_debug:
 	$(Q)echo "APPS_DIRS = $(APPS_DIRS)"
 	$(Q)echo "APPS_NAMES = $(APPS_NAMES)"
 	$(Q)echo "APPS_TARGETS = $(APPS_TARGETS)"
+	$(Q)echo "COMMON_OBJS = $(COMMON_OBJS)"
 	$(Q)echo "ARCH_OBJS = $(ARCH_OBJS)"
 	$(Q)echo "APPS_OBJS = $(APPS_OBJS)"
 
@@ -138,9 +141,9 @@ $(BUILD_DIR)/%.o: %.c $(BUILD_DIR)/config.log $(FORCE)
 define create_app_target
 APP_OBJS_$(1) := $(filter $(BUILD_DIR)/$(APPS_DIR)/$(1)/%,$(APPS_OBJS))
 
-$(BUILD_DIR)/$(1): $(ARCH_OBJS) $$(APP_OBJS_$(1)) $(ARCH_LINKER_SCRIPT) $(BUILD_DIR)/config.log $(FORCE)
+$(BUILD_DIR)/$(1): $(COMMON_OBJS) $(ARCH_OBJS) $$(APP_OBJS_$(1)) $(ARCH_LINKER_SCRIPT) $(BUILD_DIR)/config.log $(FORCE)
 	$(call target_name,LD,$$@)
-	$(Q)$(LD) $(ARCH_OBJS) $$(APP_OBJS_$(1)) $(LDFLAGS) -o $$@
+	$(Q)$(LD) $(COMMON_OBJS) $(ARCH_OBJS) $$(APP_OBJS_$(1)) $(LDFLAGS) -o $$@
 endef
 
 $(foreach app,$(APPS_NAMES),$(eval $(call create_app_target,$(app))))
